@@ -13,10 +13,22 @@ const App = props => {
 
 	const renderTasks = () => {
 		let filteredTasks = props.tasks;
+
 		if (hideCompleted) {
 			filteredTasks = filteredTasks.filter(task => !task.checked);
 		}
-		return filteredTasks.map(task => <Task key={task._id} task={task} />);
+
+		return filteredTasks.map(task => {
+			const currentUserId = props.currentUser && props.currentUser._id;
+			const showPrivateButton = task.owner === currentUserId;
+			return (
+				<Task
+					key={task._id}
+					task={task}
+					showPrivateButton={showPrivateButton}
+				/>
+			);
+		});
 	};
 
 	const handleSubmit = event => {
@@ -70,6 +82,7 @@ const App = props => {
 };
 
 export default withTracker(() => {
+	Meteor.subscribe("tasks");
 	return {
 		tasks: Tasks.find({}, { sort: { createdAt: -1 } }).fetch(),
 		incompleteCount: Tasks.find({ checked: { $ne: true } }).count(),
