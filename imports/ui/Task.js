@@ -1,17 +1,15 @@
 import React from "react";
-
+import { Meteor } from "meteor/meteor";
 import { Tasks } from "../api/tasks";
 
 const Task = props => {
 	const task = props.task;
 
 	const toggleChecked = () => {
-		Tasks.update(props.task._id, {
-			$set: { checked: !task.checked }
-		});
+		Meteor.call("tasks.setChecked", task._id, !task.checked);
 	};
 
-	const deleteThisTask = () => Tasks.remove(task._id);
+	const deleteThisTask = () => Meteor.call("tasks.remove", task._id);
 
 	const taskClassName = task.checked ? "checked" : "";
 
