@@ -28,7 +28,9 @@ const Task = props => {
 				onClick={toggleChecked}
 			/>
 
-			<span className="text">{task.text}</span>
+			<span className="text">
+				<strong>{task.username}</strong>:{task.text}
+			</span>
 		</li>
 	);
 };
