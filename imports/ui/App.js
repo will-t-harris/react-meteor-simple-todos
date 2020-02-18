@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Meteor } from "meteor/meteor";
 import { withTracker } from "meteor/react-meteor-data";
 
 import { Tasks } from "../api/tasks";
@@ -25,7 +26,9 @@ const App = props => {
 
 		Tasks.insert({
 			text,
-			createdAt: new Date()
+			createdAt: new Date(),
+			owner: Meteor.userId(),
+			username: Meteor.user().username
 		});
 
 		setInput("");
@@ -52,14 +55,18 @@ const App = props => {
 
 				<AccountsUIWrapper />
 
-				<form className="new-task" onSubmit={handleSubmit}>
-					<input
-						type="text"
-						placeholder="Type to add new tasks"
-						value={input}
-						onChange={event => setInput(event.target.value)}
-					/>
-				</form>
+				{props.currentUser ? (
+					<form className="new-task" onSubmit={handleSubmit}>
+						<input
+							type="text"
+							placeholder="Type to add new tasks"
+							value={input}
+							onChange={event => setInput(event.target.value)}
+						/>
+					</form>
+				) : (
+					""
+				)}
 			</header>
 
 			<ul>{renderTasks()}</ul>
@@ -70,6 +77,7 @@ const App = props => {
 export default withTracker(() => {
 	return {
 		tasks: Tasks.find({}, { sort: { createdAt: -1 } }).fetch(),
-		incompleteCount: Tasks.find({ checked: { $ne: true } }).count()
+		incompleteCount: Tasks.find({ checked: { $ne: true } }).count(),
+		currentUser: Meteor.user()
 	};
 })(App);
